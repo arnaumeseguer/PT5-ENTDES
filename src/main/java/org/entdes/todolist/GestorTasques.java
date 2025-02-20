@@ -57,7 +57,7 @@ public class GestorTasques {
         return novaTasca.getId();
     }
 
-    private void validarSiExisteixTasca(int id, String descripcio) throws Exception {
+    public void validarSiExisteixTasca(int id, String descripcio) throws Exception {
 
         for (Tasca tasca : llista) {
             if (tasca.getDescripcio().equalsIgnoreCase(descripcio)) {

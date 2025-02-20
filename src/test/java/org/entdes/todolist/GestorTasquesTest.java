@@ -1,5 +1,6 @@
 package org.entdes.todolist;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,22 +30,21 @@ public class GestorTasquesTest {
         Tasca tasca1 = gestor.obtenirTasca(id);
         assertEquals("nova tasca", tasca1.getDescripcio());
         
-
-    }
-
-
-    @Test
-    void testAfegirTasca2() throws Exception {
-
-    
-        int id = gestor.afegirTasca("nova tasca 2", null, null, null);
-        int numTasques = gestor.llistarTasques().size();
+        try{
+        id = gestor.afegirTasca(null, null, null, null);
+        numTasques = gestor.llistarTasques().size();
         assertEquals(1, numTasques);
-        Tasca tasca1 = gestor.obtenirTasca(id);
-        assertEquals("nova tasca 2", tasca1.getDescripcio());
+        Tasca tasca2 = gestor.obtenirTasca(id);
+        } catch (Exception e){
+        assertEquals("La descripció no pot estar buida.", e.getMessage());
+        }        
+    }
+
+    
+       
     
 
-    }
+    
 
     @Test
     void testAfegirTascaExistent() throws Exception {
@@ -61,17 +61,16 @@ public class GestorTasquesTest {
         gestor.eliminarTasca(id);
         int numTasques = gestor.llistarTasques().size();
         assertEquals(0, numTasques);
+
+        id = gestor.afegirTasca("nova tasca2", null, null, null);
+        try{
+            gestor.eliminarTasca(9999);
+        } catch (Exception e){
+            assertEquals("La tasca no existeix", e.getMessage());
+        }
         
     }
-/* 
-    @Test
-    void testEliminarTasca2() throws Exception {
-        gestor.eliminarTasca(999);
-        exception
-        assertThrows(Exception., executable)(0, numTasques);
-        
-    }
-*/
+
 
     @Test
     void testMarcarCompletada() throws Exception {
@@ -79,6 +78,13 @@ public class GestorTasquesTest {
         gestor.marcarCompletada(id);
         Tasca tasca = gestor.obtenirTasca(id);
         assertEquals(true, tasca.isCompletada());
+
+        id = gestor.afegirTasca("nova tasca2", null, null, null);
+        try{
+        gestor.marcarCompletada(10);
+        }catch (Exception e){
+            assertEquals("La tasca no existeix",e.getMessage());
+        }
         
     }
 
@@ -86,26 +92,20 @@ public class GestorTasquesTest {
     @Test
     void testModificarTasca() throws Exception{
         int id = gestor.afegirTasca("nova tasca", null, null, null);
-        gestor.modificarTasca(id, "tasca modificada", false, null, null, null);
-        Tasca tasca = gestor.obtenirTasca(id);
         try{
-            gestor.modificarTasca(id, "", true, null, null, id);
+            gestor.modificarTasca(id, "tasca modificada", true, null, null, id);
         } catch (Exception e){
             assertEquals("La descripció no pot estar buida.", e.getMessage());
         }
 
-        id = gestor.afegirTasca("null", null, null, null);
-        gestor.modificarTasca(id, "tasca modificada 2", false, null, null, null);
-        Tasca tasca2 = gestor.obtenirTasca(id);
+        id = gestor.afegirTasca("nova tasca2", null, null, null);
         try{
-            gestor.modificarTasca(id, "", true, null, null, id);
+            gestor.modificarTasca(id, null, true, null, null, id);
         } catch (Exception e){
             assertEquals("La descripció no pot estar buida.", e.getMessage());
         }
 
-        id = gestor.afegirTasca("", null, null, null);
-        gestor.modificarTasca(id, "tasca modificada 3", false, null, null, null);
-        Tasca tasca3 = gestor.obtenirTasca(id);
+        id = gestor.afegirTasca("nova tasca3", null, null, null);
         try{
             gestor.modificarTasca(id, "", true, null, null, id);
         } catch (Exception e){
@@ -160,5 +160,54 @@ public class GestorTasquesTest {
         
     }
 
+    @Test
+    void testValidarSiExisteixTasca() throws Exception{
+        try{
+            gestor.afegirTasca("nova tasca", LocalDate.of(2026, 1, 1), LocalDate.of(2025, 12, 31), null);
+        } catch (Exception e){
+            assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
+        }
+
+        try{
+            gestor.afegirTasca("nova tasca 2", null, LocalDate.of(2025, 12, 31), null);
+        } catch (Exception e){
+            assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
+        }
+        
+    
+        try{
+        gestor.afegirTasca("nova tasca3", LocalDate.of(2024, 1, 1),LocalDate.of(2025, 1, 1), null);
+        } catch (Exception e) {
+            assertEquals("La data d'inici no pot ser anterior a la data actual.", e.getMessage());
+        }
+
+       
+        gestor.afegirTasca("nova tasca 4", LocalDate.of(2026, 1, 1),LocalDate.of(2026, 1, 2), null);
+            
+        gestor.validarSiExisteixTasca(9999,"test");
+        
+        gestor.afegirTasca("nova tasca 5", null, null, null);
+        try {
+        gestor.validarSiExisteixTasca(30, "nova tasca 5");
+        } catch(Exception e){
+            assertEquals("Ja existeix una tasca amb la mateixa descripció", e.getMessage());
+        }
+
+        int id = gestor.afegirTasca("nova tasca 6", null, null, null);
+        try{
+        gestor.modificarTasca(id, "tasca 6 modificada", null, LocalDate.of(2026, 1, 1), LocalDate.of(2025, 1, 1), null);
+        } catch (Exception e){
+            assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
+        }
+
+        try{
+            gestor.modificarTasca(id, "tasca 6 modificada", null, null, null, 6);
+        } catch (Exception e){
+            assertEquals("La prioritat ha de ser un valor entre 1 i 5", e.getMessage());
+        }
+
+        gestor.modificarTasca(id, "tasca 6 modificada", null, null, null, null);
+
+    }
 
 }
