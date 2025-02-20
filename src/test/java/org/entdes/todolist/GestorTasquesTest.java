@@ -93,7 +93,7 @@ public class GestorTasquesTest {
     void testModificarTasca() throws Exception{
         int id = gestor.afegirTasca("nova tasca", null, null, null);
         try{
-            gestor.modificarTasca(id, "tasca modificada", true, null, null, id);
+            gestor.modificarTasca(id, "tasca modificada", true, null, null, null);
         } catch (Exception e){
             assertEquals("La descripció no pot estar buida.", e.getMessage());
         }
@@ -132,7 +132,7 @@ public class GestorTasquesTest {
 
     @Test
     void testLlistarTasques() throws Exception {
-        int id = gestor.afegirTasca("nova tasca", null, null, null);
+        gestor.afegirTasca("nova tasca", null, null, null);
         
 
         
@@ -141,7 +141,7 @@ public class GestorTasquesTest {
 
     @Test
     void testLlistarTasquesPerDescripcio()throws Exception {
-        int id = gestor.afegirTasca("nova tasca", null, null, null);
+        gestor.afegirTasca("nova tasca", null, null, null);
         List<Tasca> llista = gestor.llistarTasquesPerDescripcio("nova");
         assertEquals(1, llista.size());
         assertEquals("nova tasca", llista.get(0).getDescripcio(), "La descripció de la tasca filtrada no és la correcta");
@@ -163,51 +163,68 @@ public class GestorTasquesTest {
     @Test
     void testValidarSiExisteixTasca() throws Exception{
         try{
-            gestor.afegirTasca("nova tasca", LocalDate.of(2026, 1, 1), LocalDate.of(2025, 12, 31), null);
+            gestor.afegirTasca("nova tasca", LocalDate.of(2126, 1, 1), LocalDate.of(2125, 12, 31), null);
         } catch (Exception e){
             assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
         }
 
         try{
-            gestor.afegirTasca("nova tasca 2", null, LocalDate.of(2025, 12, 31), null);
+            gestor.afegirTasca("nova tasca 2", null, LocalDate.of(2125, 12, 31), null);
         } catch (Exception e){
             assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
         }
         
     
         try{
-        gestor.afegirTasca("nova tasca3", LocalDate.of(2024, 1, 1),LocalDate.of(2025, 1, 1), null);
+        gestor.afegirTasca("nova tasca3", LocalDate.of(2124, 1, 1),LocalDate.of(2125, 1, 1), null);
         } catch (Exception e) {
             assertEquals("La data d'inici no pot ser anterior a la data actual.", e.getMessage());
         }
 
        
-        gestor.afegirTasca("nova tasca 4", LocalDate.of(2026, 1, 1),LocalDate.of(2026, 1, 2), null);
+    
             
         gestor.validarSiExisteixTasca(9999,"test");
         
-        gestor.afegirTasca("nova tasca 5", null, null, null);
+        gestor.afegirTasca("nova tasca 4", null, null, null);
         try {
-        gestor.validarSiExisteixTasca(30, "nova tasca 5");
+        gestor.validarSiExisteixTasca(30, "nova tasca 4");
         } catch(Exception e){
             assertEquals("Ja existeix una tasca amb la mateixa descripció", e.getMessage());
         }
 
-        int id = gestor.afegirTasca("nova tasca 6", null, null, null);
+        int id = gestor.afegirTasca("nova tasca 5", null, null, null);
         try{
-        gestor.modificarTasca(id, "tasca 6 modificada", null, LocalDate.of(2026, 1, 1), LocalDate.of(2025, 1, 1), null);
+        gestor.modificarTasca(id, "tasca 5 modificada", null, LocalDate.of(2125, 3, 1), null, null);
         } catch (Exception e){
             assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
         }
 
+        id = gestor.afegirTasca("nova tasca 6", null, null, null);
         try{
-            gestor.modificarTasca(id, "tasca 6 modificada", null, null, null, 6);
+            gestor.modificarTasca(id, "tasca 6 modificada", null, LocalDate.of(2125, 3, 1), LocalDate.of(2126, 1, 1), 6);
+            
+        
+        
+        
         } catch (Exception e){
             assertEquals("La prioritat ha de ser un valor entre 1 i 5", e.getMessage());
         }
 
         gestor.modificarTasca(id, "tasca 6 modificada", null, null, null, null);
 
+        
     }
+
+
+    @Test
+    void testLlistarTasquesPerComplecio() throws Exception {
+        int id = gestor.afegirTasca("nova tasca", null, null, null);
+        gestor.marcarCompletada(id);
+        id = gestor.afegirTasca("nova tasca 2", null, null, null);
+        gestor.llistarTasquesPerComplecio(true);
+        gestor.llistarTasquesPerComplecio(false);
+    }
+    
 
 }
