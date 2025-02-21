@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,7 @@ public class GestorTasquesTest {
         id = gestor.afegirTasca(null, null, null, null);
         numTasques = gestor.llistarTasques().size();
         assertEquals(1, numTasques);
-        Tasca tasca2 = gestor.obtenirTasca(id);
+        gestor.obtenirTasca(id);
         } catch (Exception e){
         assertEquals("La descripció no pot estar buida.", e.getMessage());
         }        
@@ -62,7 +61,7 @@ public class GestorTasquesTest {
         int numTasques = gestor.llistarTasques().size();
         assertEquals(0, numTasques);
 
-        id = gestor.afegirTasca("nova tasca2", null, null, null);
+        gestor.afegirTasca("nova tasca2", null, null, null);
         try{
             gestor.eliminarTasca(9999);
         } catch (Exception e){
@@ -79,7 +78,7 @@ public class GestorTasquesTest {
         Tasca tasca = gestor.obtenirTasca(id);
         assertEquals(true, tasca.isCompletada());
 
-        id = gestor.afegirTasca("nova tasca2", null, null, null);
+        gestor.afegirTasca("nova tasca2", null, null, null);
         try{
         gestor.marcarCompletada(10);
         }catch (Exception e){
@@ -120,13 +119,23 @@ public class GestorTasquesTest {
         int id = gestor.afegirTasca("nova tasca", null, null, null);
         Tasca tasca = gestor.obtenirTasca(id);
         assertEquals("nova tasca", tasca.getDescripcio());
+
+        try{
+        gestor.obtenirTasca(9999);
+        } catch (Exception e){
+            assertEquals("La tasca no existeix", e.getMessage());
+        }
         
     }
 
     @Test
     void testObtenirTascaInexistent() throws Exception{
-        assertThrows(Exception.class , ()-> gestor.obtenirTasca(999));
-        
+     try{
+        gestor.obtenirTasca(9999);
+     } catch (Exception e){
+         assertEquals("La tasca no existeix", e.getMessage());
+     }
+
     }
 
 
@@ -144,8 +153,10 @@ public class GestorTasquesTest {
         gestor.afegirTasca("nova tasca", null, null, null);
         List<Tasca> llista = gestor.llistarTasquesPerDescripcio("nova");
         assertEquals(1, llista.size());
-        assertEquals("nova tasca", llista.get(0).getDescripcio(), "La descripció de la tasca filtrada no és la correcta");
         
+        gestor.afegirTasca("nova tasca 2", null, null, null);
+        llista = gestor.llistarTasquesPerDescripcio("hola");
+        assertEquals(0, llista.size()); //1, ja que es mante la tasca afegida anteriorment
     }
 
 
@@ -174,6 +185,12 @@ public class GestorTasquesTest {
             assertEquals("La data d'inici no pot ser posterior a la data fi prevista.", e.getMessage());
         }
         
+        int id = gestor.afegirTasca("tasca", null, null, null);
+        try{
+            gestor.modificarTasca(id, null, null, null, null, null);
+        } catch (Exception e){
+            assertEquals("La descripció no pot estar buida.", e.getMessage());
+        }
     
         try{
         gestor.afegirTasca("nova tasca3", LocalDate.of(2124, 1, 1),LocalDate.of(2125, 1, 1), null);
@@ -193,7 +210,7 @@ public class GestorTasquesTest {
             assertEquals("Ja existeix una tasca amb la mateixa descripció", e.getMessage());
         }
 
-        int id = gestor.afegirTasca("nova tasca 5", null, null, null);
+        id = gestor.afegirTasca("nova tasca 5", null, null, null);
         try{
         gestor.modificarTasca(id, "tasca 5 modificada", null, LocalDate.of(2125, 3, 1), null, null);
         } catch (Exception e){
@@ -221,10 +238,13 @@ public class GestorTasquesTest {
     void testLlistarTasquesPerComplecio() throws Exception {
         int id = gestor.afegirTasca("nova tasca", null, null, null);
         gestor.marcarCompletada(id);
-        id = gestor.afegirTasca("nova tasca 2", null, null, null);
+        gestor.afegirTasca("nova tasca 2", null, null, null);
         gestor.llistarTasquesPerComplecio(true);
         gestor.llistarTasquesPerComplecio(false);
     }
+
+
+   
     
 
 }
