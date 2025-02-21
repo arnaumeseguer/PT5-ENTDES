@@ -33,6 +33,7 @@ public class GestorTasquesTest {
         id = gestor.afegirTasca(null, null, null, null);
         numTasques = gestor.llistarTasques().size();
         assertEquals(1, numTasques);
+        
         gestor.obtenirTasca(id);
         } catch (Exception e){
         assertEquals("La descripció no pot estar buida.", e.getMessage());
