@@ -40,20 +40,6 @@ public class GestorTasquesTest {
         }        
     }
 
-    
-       
-    
-
-    
-
-    @Test
-    void testAfegirTascaExistent() throws Exception {
-        gestor.afegirTasca("nova tasca", null, null, null);
-        //Exception ex = assertThrows(Exception.class, ()-> gestor.afegirTasca("nova tasca"));
-        
-    
-        }
-
 
     @Test
     void testEliminarTasca() throws Exception {
@@ -111,6 +97,7 @@ public class GestorTasquesTest {
         } catch (Exception e){
             assertEquals("La descripció no pot estar buida.", e.getMessage());
         }
+
         
     }
 
